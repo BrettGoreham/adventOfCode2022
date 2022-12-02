@@ -13,13 +13,5 @@ for c in content:
         count += int(c)
 
 list.sort(reverse=True)
-print('part 1: ' + str(max(list)))
-
-
-top = max(list)
-list.remove(top)
-second = max(list)
-list.remove(second)
-third = max(list)
-
-print('part 2: ' + str(top + second + third))
+print('part 1: ' + str(list[0]))
+print('part 2: ' + str(list[0] + list[1] + list[2]))
