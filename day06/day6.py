@@ -1,5 +1,3 @@
-import re
-
 with open('day6Input.txt') as f:
     content = f.readlines()
 
