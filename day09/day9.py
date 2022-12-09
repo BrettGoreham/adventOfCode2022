@@ -19,16 +19,16 @@ def print_visited_of_tail(steps, rope_length):
                 rope[0][1] -= 1
 
             for x in range(1, rope_length):
+                last_x, last_y = rope[x-1][0], rope[x-1][1]
+                current = rope[x]
+                if not (last_x - 1 <= current[0] <= last_x + 1 and last_y - 1 <= current[1] <= last_y + 1):
+                    if current[0] != last_x:
+                        current[0] += int((last_x - current[0]) / abs(last_x - current[0]))
+                    if current[1] != last_y:
+                        current[1] += int((last_y - current[1]) / abs(last_y - current[1]))
 
-                if not (rope[x - 1][0] - 1 <= rope[x][0] <= rope[x - 1][0] + 1 and rope[x - 1][1] - 1 <= rope[x][1] <=
-                        rope[x - 1][1] + 1):
-                    
-                    if rope[x][0] != rope[x - 1][0]:
-                        rope[x][0] += int((rope[x - 1][0] - rope[x][0]) / abs((rope[x - 1][0] - rope[x][0])))
-                    if rope[x][1] != rope[x - 1][1]:
-                        rope[x][1] += int((rope[x - 1][1] - rope[x][1]) / abs((rope[x - 1][1] - rope[x][1])))
                     if x == rope_length - 1:
-                        visited.add((rope[x][0], rope[x][1]))
+                        visited.add((current[0], current[1]))
 
     return len(visited)
 
