@@ -33,7 +33,6 @@ print('part 2: find 7 capital letters in picture')
 s = ''
 for x in range(240):
     if x != 0 and x % 40 == 0:
-        print(s)
-        s = ''
+        s += '\n'
     s += pixels[x]
 print(s)
