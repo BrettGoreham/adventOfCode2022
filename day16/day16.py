@@ -29,7 +29,7 @@ hoptions = {}
 for x in valuedFlows:
     minsToValue = {}
     been = {x: 0}
-    maxflow+= stuff[x][0]
+    maxflow += stuff[x][0]
     places = [(x, 0)]
 
     while len(places) > 0:
@@ -47,6 +47,8 @@ for x in valuedFlows:
 
 
 results = []
+
+
 def hopTo30(steps_remaining, current_flow, open_locations, total_flow):
     location = open_locations[-1]
 
@@ -81,76 +83,81 @@ results.sort(reverse=True)
 print(results[0])
 
 
-def hopTo26(steps_remaining, current_flow, open_locations, partnerGoal, stepsToGoal, total_flow):
+def hopTo26(steps_remaining, current_flow, open_locations, partner_goal, steps_to_partner_goal, total_flow):
+
     if not total_flow + (steps_remaining * maxflow) < check['res'][0]:
         location = open_locations[-1]
-        a = list(filter(lambda z: z not in open_locations and partnerGoal != z and hoptions[location][z] + 1 <= steps_remaining, hoptions[location]))
+        avail_goals = list(filter(lambda z: z not in open_locations and partner_goal != z and hoptions[location][z] < steps_remaining, hoptions[location]))
 
-        if len(a) == 0:
+        if len(avail_goals) == 0:
             while steps_remaining > 0:
                 total_flow += current_flow
-                stepsToGoal -= 1
-                if stepsToGoal == -1:
-                    current_flow += stuff[partnerGoal][0]
-                    open_locations.append(partnerGoal)
+                steps_to_partner_goal -= 1
                 steps_remaining -= 1
+                if steps_to_partner_goal == -1:
+                    current_flow += stuff[partner_goal][0]
+                    open_locations.append(partner_goal)
+                    avail_goals = list(filter(lambda z: z not in open_locations and hoptions[partner_goal][z] < steps_remaining, hoptions[partner_goal]))
+                    for x in avail_goals:
+                        hopTo26(steps_remaining, current_flow, copy.deepcopy(open_locations), x, hoptions[partner_goal][x], total_flow)
+
 
             if total_flow > check['res'][0]:
                 print('new high: ' + str(total_flow))
                 check['res'] = (total_flow, open_locations)
         else:
-            for option in a:
-                steps_used = hoptions[location][option]
+            for goal in avail_goals:
+                steps_to_goal = hoptions[location][goal]
 
-                if steps_used < stepsToGoal:
+                if steps_to_goal < steps_to_partner_goal:
 
                     steps = steps_remaining
-                    steps -= steps_used
-                    new_total_flow = total_flow + (current_flow * steps_used)
+                    steps -= steps_to_goal
+                    new_total_flow = total_flow + (current_flow * steps_to_goal)
 
                     #open
                     steps -= 1
                     new_total_flow += current_flow
-                    new_flow = current_flow + stuff[option][0]
+                    new_flow = current_flow + stuff[goal][0]
 
                     new_locations = copy.deepcopy(open_locations)
-                    new_locations.append(option)
+                    new_locations.append(goal)
 
-                    hopTo26(steps, new_flow, new_locations, partnerGoal, stepsToGoal - (steps_used + 1), new_total_flow)
+                    hopTo26(steps, new_flow, new_locations, partner_goal, steps_to_partner_goal - (steps_to_goal + 1), new_total_flow)
 
-                if stepsToGoal < steps_used:
-                    if partnerGoal == 'AA':
-                        hopTo26(steps_remaining, current_flow, open_locations, option, steps_used, total_flow)
+                if steps_to_partner_goal < steps_to_goal:
+                    if partner_goal == 'AA':
+                        hopTo26(steps_remaining, current_flow, open_locations, goal, steps_to_goal, total_flow)
                     else:
                         steps = steps_remaining
-                        steps -= stepsToGoal
-                        new_total_flow = total_flow + (current_flow * stepsToGoal)
+                        steps -= steps_to_partner_goal
+                        new_total_flow = total_flow + (current_flow * steps_to_partner_goal)
 
                         #open
                         steps -= 1
                         new_total_flow += current_flow
-                        new_flow = current_flow + stuff[partnerGoal][0]
+                        new_flow = current_flow + stuff[partner_goal][0]
 
                         new_locations = copy.deepcopy(open_locations)
-                        new_locations.append(partnerGoal)
-                        hopTo26(steps, new_flow, new_locations, option, steps_used - (stepsToGoal + 1), new_total_flow)
+                        new_locations.append(partner_goal)
+                        hopTo26(steps, new_flow, new_locations, goal, steps_to_goal - (steps_to_partner_goal + 1), new_total_flow)
 
-                if stepsToGoal == steps_used:
+                if steps_to_partner_goal == steps_to_goal:
                     steps = steps_remaining
-                    steps -= steps_used
-                    new_total_flow = total_flow + (current_flow * steps_used)
+                    steps -= steps_to_goal
+                    new_total_flow = total_flow + (current_flow * steps_to_goal)
 
                     # open
                     steps -= 1
                     new_total_flow += current_flow
-                    new_flow = current_flow + stuff[option][0] + stuff[partnerGoal][0]
+                    new_flow = current_flow + stuff[goal][0] + stuff[partner_goal][0]
                     new_locations = copy.deepcopy(open_locations)
-                    new_locations.append(partnerGoal)
-                    new_locations.append(option)
+                    new_locations.append(goal)
+                    new_locations.append(partner_goal)
 
-                    a = list(filter(lambda z: z not in new_locations and hoptions[partnerGoal][z] + 1 <= steps, hoptions[partnerGoal]))
-                    for b in a:
-                        hopTo26(steps, new_flow, new_locations, b, hoptions[partnerGoal][b], new_total_flow)
+                    avail_goals = list(filter(lambda z: z not in new_locations and hoptions[goal][z] < steps, hoptions[goal]))
+                    for b in avail_goals:
+                        hopTo26(steps, new_flow, new_locations, b, hoptions[goal][b], new_total_flow)
 
 
 
