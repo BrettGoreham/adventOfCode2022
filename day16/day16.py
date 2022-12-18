@@ -7,7 +7,7 @@ content = [x.strip() for x in content]
 
 check = {'res': (0,0)}
 
-stuff = {}
+location_to_flowrate_paths = {}
 valuedFlows = []
 for c in content:
     result = re.search('Valve ([A-Z]{2}) has flow rate=([0-9]{1,2})', c)
@@ -19,7 +19,7 @@ for c in content:
     else:
         paths = [c.split('to valve ')[1]]
 
-    stuff[name] = (flow_rate, paths)
+    location_to_flowrate_paths[name] = (flow_rate, paths)
     if flow_rate > 0 or name == 'AA':
         valuedFlows.append(name)
 
@@ -29,19 +29,19 @@ hoptions = {}
 for x in valuedFlows:
     minsToValue = {}
     been = {x: 0}
-    maxflow += stuff[x][0]
-    places = [(x, 0)]
+    maxflow += location_to_flowrate_paths[x][0]
+    locationsToTravel = [(x, 0)]
 
-    while len(places) > 0:
-        place = places.pop(0)
-        hops = stuff[place[0]][1]
+    while len(locationsToTravel) > 0:
+        location = locationsToTravel.pop(0)
+        hops = location_to_flowrate_paths[location[0]][1]
 
         for hop in hops:
-            if hop not in been or been[hop] > place[1]:
-                places.append([hop, place[1] + 1])
-                been[hop] = place[1] + 1
+            if hop not in been or been[hop] > location[1]:
+                locationsToTravel.append([hop, location[1] + 1])
+                been[hop] = location[1] + 1
 
-        places.sort(key=lambda tup: tup[1])
+        locationsToTravel.sort(key=lambda tup: tup[1])
 
     hoptions[x] = {k: v for k, v in been.items() if k in valuedFlows and k != x}
 
@@ -68,7 +68,7 @@ def hopTo30(steps_remaining, current_flow, open_locations, total_flow):
             #open
             steps -= 1
             new_total_flow += current_flow
-            new_flow = current_flow + stuff[loc][0]
+            new_flow = current_flow + location_to_flowrate_paths[loc][0]
 
             newLocations = copy.deepcopy(open_locations)
             newLocations.append(loc)
@@ -95,7 +95,7 @@ def hopTo26(steps_remaining, current_flow, open_locations, partner_goal, steps_t
                 steps_to_partner_goal -= 1
                 steps_remaining -= 1
                 if steps_to_partner_goal == -1:
-                    current_flow += stuff[partner_goal][0]
+                    current_flow += location_to_flowrate_paths[partner_goal][0]
                     open_locations.append(partner_goal)
                     avail_goals = list(filter(lambda z: z not in open_locations and hoptions[partner_goal][z] < steps_remaining, hoptions[partner_goal]))
                     for x in avail_goals:
@@ -118,7 +118,7 @@ def hopTo26(steps_remaining, current_flow, open_locations, partner_goal, steps_t
                     #open
                     steps -= 1
                     new_total_flow += current_flow
-                    new_flow = current_flow + stuff[goal][0]
+                    new_flow = current_flow + location_to_flowrate_paths[goal][0]
 
                     new_locations = copy.deepcopy(open_locations)
                     new_locations.append(goal)
@@ -136,7 +136,7 @@ def hopTo26(steps_remaining, current_flow, open_locations, partner_goal, steps_t
                         #open
                         steps -= 1
                         new_total_flow += current_flow
-                        new_flow = current_flow + stuff[partner_goal][0]
+                        new_flow = current_flow + location_to_flowrate_paths[partner_goal][0]
 
                         new_locations = copy.deepcopy(open_locations)
                         new_locations.append(partner_goal)
@@ -150,7 +150,7 @@ def hopTo26(steps_remaining, current_flow, open_locations, partner_goal, steps_t
                     # open
                     steps -= 1
                     new_total_flow += current_flow
-                    new_flow = current_flow + stuff[goal][0] + stuff[partner_goal][0]
+                    new_flow = current_flow + location_to_flowrate_paths[goal][0] + location_to_flowrate_paths[partner_goal][0]
                     new_locations = copy.deepcopy(open_locations)
                     new_locations.append(goal)
                     new_locations.append(partner_goal)
