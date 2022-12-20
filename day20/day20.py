@@ -9,20 +9,20 @@ class IntHolder:
 
 
 orderedList = []
-MoveOrder = []
+moveOrder = []
 
 part2MoveOrder = []
 part2OrderedList = []
 for x in content:
     obj = IntHolder(x)
     orderedList.append(obj)
-    MoveOrder.append(obj)
+    moveOrder.append(obj)
 
     part2 = IntHolder(x * 811589153)
     part2MoveOrder.append(part2)
     part2OrderedList.append(part2)
 
-lengthOfList = len(MoveOrder)
+lengthOfList = len(moveOrder)
 
 
 def positive_find_new_index(_index, _val, list_length):
@@ -83,7 +83,7 @@ def find_x_thousands_after_zero(ordered_list):
     return thousand_index, two_thousand_index, three_thousand_index
 
 
-do_moves_x_times(orderedList, MoveOrder, 1)
+do_moves_x_times(orderedList, moveOrder, 1)
 thou, twothou, threethou = find_x_thousands_after_zero(orderedList)
 print('part 1: ' + str(thou + twothou + threethou))
 
